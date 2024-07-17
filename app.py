@@ -7,12 +7,10 @@
 #
 # Streamlit is designed to run its apps as Python scripts, not functions, so we separate the Streamlit
 # code into this module, away from the Modal application code.
-import numpy as np
-import pandas as pd
 import streamlit as st
-from huggingface_hub import hf_hub_download
 from icml_finder.vectordb import LanceSchema
 from lancedb.rerankers import CohereReranker
+from icml_finder.vectordb import make_vectordb
 
 @st.cache_resource()
 def get_reranker():
@@ -20,9 +18,7 @@ def get_reranker():
 
 st.cache_resource()
 def get_vectordb():
-    from icml_finder.vectordb import make_vectordb
-    hf_hub_download(repo_id="porestar/icml2024_embeddings", filename="icml_sessions.jsonl", local_dir="/root/data", repo_type="dataset")
-    return make_vectordb("/root/data/icml_sessions.jsonl", "/root/data/vectordb")
+    return make_vectordb("/icml_data/icml_sessions.jsonl", "/root/data/vectordb")
 
 table = get_vectordb()
 reranker = get_reranker()

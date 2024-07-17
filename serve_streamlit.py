@@ -5,13 +5,15 @@
 import shlex
 import subprocess
 from pathlib import Path
-
+from huggingface_hub import hf_hub_download
 import modal
 
 # ## Define container dependencies
 #
 # The `app.py` script imports three third-party packages, so we include these in the example's
 # image definition.
+
+hf_hub_download(repo_id="porestar/icml2024_embeddings", filename="icml_sessions.jsonl", local_dir="./data", repo_type="dataset")
 
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2", "huggingface_hub", "lancedb", "openai", "tantivy", "jsonlines", "cohere"
@@ -46,7 +48,8 @@ streamlit_script_mount = modal.Mount.from_local_file(
 @app.function(
     allow_concurrent_inputs=100,
     mounts=[streamlit_script_mount],
-    secrets=[modal.Secret.from_name("icml-finder-openai"), modal.Secret.from_name("cohere-api-key")]
+    secrets=[modal.Secret.from_name("icml-finder-openai"), modal.Secret.from_name("cohere-api-key")],
+    volumes={"/icml_data": modal.Volume.from_name("icml_data")}
 )
 @modal.web_server(8000)
 def run():
