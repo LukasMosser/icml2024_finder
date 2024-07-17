@@ -8,7 +8,9 @@ from icml_finder.data import Session
 import json
 import jsonlines
 from tqdm.auto import tqdm 
+from huggingface_hub import HfApi
 
+api = HfApi()
 client = openai.OpenAI()
 
 # Function to parse time using OpenAI's GPT-3.5-turbo with retries and convert to Vienna time zone
@@ -102,3 +104,10 @@ if __name__ == "__main__":
     with jsonlines.open('data/icml_sessions.jsonl', mode='w') as writer:
         for session in updated_sessions:
             writer.write(session.model_dump_json())
+
+    api.upload_file(
+        path_or_fileobj="data/icml_sessions.jsonl",
+        path_in_repo="icml_sessions.jsonl",
+        repo_id="porestar/icml2024_embeddings",
+        repo_type="dataset",
+    )
