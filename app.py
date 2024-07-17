@@ -7,53 +7,48 @@
 #
 # Streamlit is designed to run its apps as Python scripts, not functions, so we separate the Streamlit
 # code into this module, away from the Modal application code.
+import numpy as np
+import pandas as pd
+import streamlit as st
+from huggingface_hub import hf_hub_download
+from icml_finder.vectordb import LanceSchema
+from lancedb.rerankers import CohereReranker
+
+@st.cache_resource()
+def get_reranker():
+    return CohereReranker(column="abstract")
+
+st.cache_resource()
+def get_vectordb():
+    from icml_finder.vectordb import make_vectordb
+    hf_hub_download(repo_id="porestar/icml2024_embeddings", filename="icml_sessions.jsonl", local_dir="/root/data", repo_type="dataset")
+    return make_vectordb("/root/data/icml_sessions.jsonl", "/root/data/vectordb")
+
+table = get_vectordb()
+reranker = get_reranker()
 
 
-def main():
-    import numpy as np
-    import pandas as pd
-    import streamlit as st
+st.title("ICML 2024 Session Finder")
 
-    st.title("Uber pickups in NYC!")
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    DATE_COLUMN = "date/time"
-    DATA_URL = (
-        "https://s3-us-west-2.amazonaws.com/"
-        "streamlit-demo-data/uber-raw-data-sep14.csv.gz"
-    )
-
-    @st.cache_data
-    def load_data(nrows):
-        data = pd.read_csv(DATA_URL, nrows=nrows)
-
-        def lowercase(x):
-            return str(x).lower()
-
-        data.rename(lowercase, axis="columns", inplace=True)
-        data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])
-        return data
-
-    data_load_state = st.text("Loading data...")
-    data = load_data(10000)
-    data_load_state.text("Done! (using st.cache_data)")
-
-    if st.checkbox("Show raw data"):
-        st.subheader("Raw data")
-        st.write(data)
-
-    st.subheader("Number of pickups by hour")
-    hist_values = np.histogram(
-        data[DATE_COLUMN].dt.hour, bins=24, range=(0, 24)
-    )[0]
-    st.bar_chart(hist_values)
-
-    # Some number in the range 0-23
-    hour_to_filter = st.slider("hour", 0, 23, 17)
-    filtered_data = data[data[DATE_COLUMN].dt.hour == hour_to_filter]
-
-    st.subheader("Map of all pickups at %s:00" % hour_to_filter)
-    st.map(filtered_data)
+# Display chat messages from history on app rerun
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 
-if __name__ == "__main__":
-    main()
+# React to user input
+if prompt := st.chat_input("What is up?"):
+    # Display user message in chat message container
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    # Add user message to chat history
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    results = table.search(prompt, query_type="hybrid").limit(10).rerank(normalize='score', reranker=reranker).to_pydantic(LanceSchema)
+    print(results)
+    for result in results:
+        st.code(result.payload.dict())

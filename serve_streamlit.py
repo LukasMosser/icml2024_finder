@@ -14,8 +14,8 @@ import modal
 # image definition.
 
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2"
-)
+    "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2", "huggingface_hub", "lancedb", "openai", "tantivy", "jsonlines", "cohere"
+).copy_local_dir("icml_finder", "/root/icml_finder")
 
 app = modal.App(name="example-modal-streamlit", image=image)
 
@@ -46,6 +46,7 @@ streamlit_script_mount = modal.Mount.from_local_file(
 @app.function(
     allow_concurrent_inputs=100,
     mounts=[streamlit_script_mount],
+    secrets=[modal.Secret.from_name("icml-finder-openai"), modal.Secret.from_name("cohere-api-key")]
 )
 @modal.web_server(8000)
 def run():

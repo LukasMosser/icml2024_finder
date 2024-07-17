@@ -10,3 +10,6 @@ pytz
 tenacity
 jsonlines
 tqdm
+lancedb
+tantivy==0.22.0
+huggingface_hub
