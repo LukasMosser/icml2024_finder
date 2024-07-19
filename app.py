@@ -37,7 +37,7 @@ def group_and_sort_events(events: List[LanceSchema]) -> dict:
 
     # Sort events within each date group by the time of their session
     for date_key in grouped_events:
-        grouped_events[date_key].sort(key=lambda x: x.session.time_vienna)
+        grouped_events[date_key].sort(key=lambda x: x.payload.time_vienna)
 
     return grouped_events
 
@@ -51,7 +51,7 @@ def make_item(obj: LanceSchema):
                 ### Authors: 
                 {obj.payload.speakers_authors}
                 ### Abstract:
-                {obj.payload.speakers_authors}
+                {obj.payload.abstract}
                 ### [Link]({obj.payload.virtualsite_url})
             """
             )
@@ -89,8 +89,7 @@ if prompt := st.chat_input("What is up?"):
     grouped_sorted_events = group_and_sort_events(results)
 
     for date_key, events_on_date in grouped_sorted_events.items():
-        print(f"Events on {date_key}:")
+        st.markdown(f"## Events on {date_key}:")
         for event in events_on_date:
-            print(f"  {event.session.time_vienna.time()} - {event.session.name}")
             make_item(event)
         
