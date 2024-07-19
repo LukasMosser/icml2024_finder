@@ -19,7 +19,7 @@ image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2", "huggingface_hub", "lancedb", "openai", "tantivy", "jsonlines", "cohere"
 ).copy_local_dir("icml_finder", "/root/icml_finder")
 
-app = modal.App(name="example-modal-streamlit", image=image)
+app = modal.App(name="icml-finder", image=image)
 
 # ## Mounting the `app.py` script
 #
