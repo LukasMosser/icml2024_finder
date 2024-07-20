@@ -17,6 +17,9 @@ class LanceSchema(LanceModel):
     abstract: str = embeddings.SourceField()
     payload: Session
 
+    class Config:
+            frozen = True
+
 def make_vectordb(input_file_path, vectordb_dir):
 
     if not os.path.exists(vectordb_dir):
