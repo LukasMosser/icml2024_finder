@@ -112,17 +112,17 @@ with st.sidebar:
     )
 
 
-@st.cache_resource
+@st.cache_resource()
 def make_openai_client():
     return OpenAI()
 
 
-@st.cache_resource
+@st.cache_resource()
 def get_reranker():
     return CohereReranker(column="abstract")
 
 
-st.cache_resource
+st.cache_resource()
 def get_vectordb():
     return make_vectordb("/icml_data/icml_sessions.jsonl", "/root/data/vectordb")
 
