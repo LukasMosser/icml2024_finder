@@ -219,7 +219,7 @@ with chat_area:
                         "Checkbox",
                         key=f"event_id_{group}_{event_id}",
                         on_change=add_to_selected_sessions,
-                        args=[date_key, event],
+                        args=[event],
                         label_visibility="collapsed",
                     )
                 with col2:
