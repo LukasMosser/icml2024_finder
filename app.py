@@ -105,6 +105,9 @@ with st.sidebar:
     window_height = st.slider(
         "Chat Window Height", min_value=300, max_value=2000, value=900, step=1
     )
+    top_k_results = st.slider(
+        "Top-k results after ranking", min_value=5, max_value=200, value=40, step=1
+    )
 
     st.markdown(
         """
@@ -201,7 +204,7 @@ with chat_area:
     if prompt := st.chat_input("Find relevant sessions at ICML!"):
         results = (
             table.search(prompt, query_type="hybrid")
-            .limit(100)
+            .limit(top_k_results)
             .rerank(normalize="score", reranker=reranker)
             .to_pydantic(LanceSchema)
         )
