@@ -103,7 +103,7 @@ with st.sidebar:
         st.session_state["chat_messages"] = []
         st.rerun()
     window_height = st.slider(
-        "Chat Window Height", min_value=300, max_value=2000, value=900, step=1
+        "Chat Window Height", min_value=300, max_value=2000, value=550, step=1
     )
     top_k_results = st.slider(
         "Top-k results after ranking", min_value=5, max_value=200, value=40, step=1
@@ -198,7 +198,7 @@ chat_area, selection_area, summarization_area = st.columns([0.33, 0.33, 0.33])
 
 # Left column
 with chat_area:
-    st.header("ICML Session Search")
+    st.header("Session Search")
     chat_area_container = st.container(height=window_height, border=True)
 
     if prompt := st.chat_input("Find relevant sessions at ICML!"):
@@ -244,7 +244,7 @@ with selection_area:
 
 # Right column
 with summarization_area:
-    st.header("Selected Session Chat")
+    st.header("Session Chat")
 
     summary_container = st.container(height=window_height, border=True)
 
