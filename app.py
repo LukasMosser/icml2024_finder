@@ -13,7 +13,7 @@ def rag_prompt(
     messages: List[Dict[str, str]],
     query: str,
     selected_sessions: List[LanceSchema],
-) -> str:
+):
     PROMPT = """
     The user has selected following <Sessions> from the Internation Conference of Machine Learning 2024 hosted in Vienna, Austria.
 
