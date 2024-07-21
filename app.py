@@ -108,10 +108,15 @@ with st.sidebar:
 
     st.markdown(
         """
+        ## Why?!
+        I participated in the [AI Makerspace Cohort 1](https://github.com/AI-Maker-Space/LLM-Ops-Cohort-1) which gave me 1000s of dollars of free credits for all kinds of services including [Modal Labs](https://modal.com/)  and [OpenAI](https://openai.com) and I wanted to put them to good use and make something practical.  
+
+
         ## Tech Stack
         
         - Hosting: [Modal Labs](https://modal.com/)
         - CI/CD: [Github Actions](https://github.com)
+        - LLM: [OpenAI GPT-4o-mini](https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/)
         - Embeddings: [OpenAI Text-003-large](https://openai.com/index/new-embedding-models-and-api-updates/)
         - VectorDB: [LanceDB](https://lancedb.com/)
         - Reranker: [Cohere.ai](https://cohere.ai)
