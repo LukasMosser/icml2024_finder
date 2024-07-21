@@ -193,7 +193,7 @@ with chat_area:
     st.header("ICML Session Search")
     chat_area_container = st.container(height=window_height, border=True)
 
-    if prompt := st.chat_input("What is up?"):
+    if prompt := st.chat_input("What is the difference between generative and geometric Deep Learning?"):
         results = (
             table.search(prompt, query_type="hybrid")
             .limit(100)
@@ -246,7 +246,7 @@ with summarization_area:
                 with st.chat_message(message["role"]):
                     st.write(message["content"])
 
-    if prompt_summary := st.chat_input("Ask anything about selected sessions"):
+    if prompt_summary := st.chat_input("Ask anything about selected sessions!"):
         with summary_container:
             with st.chat_message("user"):
                 st.write(prompt_summary)
