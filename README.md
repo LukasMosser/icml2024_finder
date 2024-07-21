@@ -4,6 +4,8 @@ Welcome to the ICML 2024 Session Finder! This tool helps you search for sessions
 ## Just get me to the tool
 Access the [ICML Session Finder here: Link](https://lukasmosser--icml-finder-run.modal.run/)
 
+![ICML Finder in Action](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExangxY2cyNWR4anQ3b2p0YzNmYWtocmplb28wdzY0MGNreHBidHo4cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dN3DKk1UiUmbJMv4BX/giphy.gif)
+
 ## Features 
 - Session Search: Search for ICML sessions using natural language queries.
 - Selected Sessions: Add sessions to your list of selected sessions.
