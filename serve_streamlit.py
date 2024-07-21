@@ -16,7 +16,7 @@ import modal
 hf_hub_download(repo_id="porestar/icml2024_embeddings", filename="icml_sessions.jsonl", local_dir="./data", repo_type="dataset")
 
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2", "huggingface_hub", "lancedb", "openai", "tantivy", "jsonlines", "cohere"
+    "streamlit~=1.35.0", "numpy~=1.26.4", "pandas~=2.2.2", "huggingface_hub", "lancedb", "openai", "tantivy", "jsonlines", "cohere", "streamlit_js_eval"
 ).copy_local_dir("icml_finder", "/root/icml_finder")
 
 app = modal.App(name="icml-finder", image=image)
