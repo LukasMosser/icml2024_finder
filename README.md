@@ -1,6 +1,9 @@
 # ICML 2024 Session Finder. 
 Welcome to the ICML 2024 Session Finder! This tool helps you search for sessions and ask questions about them using a Retrieval Augmented Generation (RAG) pattern. The selected sessions include the session name, authors, time, location, and abstract, which are added to the language model's prompt.  
 
+## Just get me to the tool
+Access the [ICML Session Finder here: Link](https://lukasmosser--icml-finder-run.modal.run/)
+
 ## Features 
 - Session Search: Search for ICML sessions using natural language queries.
 - Selected Sessions: Add sessions to your list of selected sessions.
