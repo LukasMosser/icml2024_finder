@@ -112,7 +112,7 @@ with st.sidebar:
     st.markdown(
         """
         ## Why?!
-        I participated in the [AI Makerspace Cohort 1](https://github.com/AI-Maker-Space/LLM-Ops-Cohort-1) which gave me 1000s of dollars of free credits for all kinds of services including [Modal Labs](https://modal.com/)  and [OpenAI](https://openai.com) and I wanted to put them to good use and make something practical.  
+        I participated in the [Parlance Labs Conference - Mastering LLMs: A Conference For Developers & Data Scientists](https://maven.com/parlance-labs/fine-tuning) which gave me 1000s of dollars of free credits for all kinds of services including [Modal Labs](https://modal.com/)  and [OpenAI](https://openai.com) and I wanted to put them to good use and make something practical.  
 
 
         ## Tech Stack
