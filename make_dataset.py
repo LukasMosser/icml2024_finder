@@ -33,6 +33,7 @@ def parse_time_with_gpt(time_string):
     try:
         time_json = json.loads(response.choices[0].message.content)
         date_string = time_json["datetime"]
+
         # Removing the 'PDT' from the string for parsing
         date_string_parsed = date_string[:-4].strip()
 

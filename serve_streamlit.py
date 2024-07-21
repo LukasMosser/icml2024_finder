@@ -1,7 +1,4 @@
-# 1. This module, which defines the Modal objects (name the script `serve_streamlit.py` locally).
-# 2. `app.py`, which is any Streamlit script to be mounted into the Modal
-# function ([download script](https://github.com/modal-labs/modal-examples/blob/main/10_integrations/streamlit/app.py)).
-
+# Based on Modal Labs example script for serving streamlit apps
 import shlex
 import subprocess
 from pathlib import Path
@@ -12,7 +9,6 @@ import modal
 #
 # The `app.py` script imports three third-party packages, so we include these in the example's
 # image definition.
-
 hf_hub_download(
     repo_id="porestar/icml2024_embeddings",
     filename="icml_sessions.jsonl",
@@ -61,6 +57,7 @@ streamlit_script_mount = modal.Mount.from_local_file(
 #
 # Inside the container, we will run the Streamlit server in a background subprocess using
 # `subprocess.Popen`. We also expose port 8000 using the `@web_server` decorator.
+# Here we also include a volume that has the vectordb and the two secrets for cohere and openai
 
 
 @app.function(

@@ -14,6 +14,10 @@ def rag_prompt(
     query: str,
     selected_sessions: List[LanceSchema],
 ):
+    """
+    Simple RAG prompting to include the selected sessions from icml into the context of the users query, only appends the query and response to the conversation.
+    """
+
     PROMPT = """
     The user has selected following <Sessions> from the Internation Conference of Machine Learning 2024 hosted in Vienna, Austria.
 
@@ -23,6 +27,7 @@ def rag_prompt(
 
     <Sessions>
     """
+
     for selected_session in selected_sessions:
         SESSION_PROMPT = f"""
         <Title>
@@ -40,8 +45,11 @@ def rag_prompt(
     PROMPT += f"""
     <Question>{query}
     """
+
     query_messages = [*messages]
     query_messages.append({"role": "user", "content": PROMPT})
+
+    # Stream response by LLM back to the front-end
     response = client.chat.completions.create(
         model="gpt-4o-mini", messages=query_messages, stream=True
     )
@@ -106,6 +114,7 @@ with st.sidebar:
         - CI/CD: [Github Actions](https://github.com)
         - Embeddings: [OpenAI Text-003-large](https://openai.com/index/new-embedding-models-and-api-updates/)
         - VectorDB: [LanceDB](https://lancedb.com/)
+        - Reranker: [Cohere.ai](https://cohere.ai)
         - Frontend: [Streamlit](https://streamlit.com)
         - Dataset Hosting: [Huggingface Datasets](https://huggingface.co/datasets/porestar/icml2024_embeddings)
 
@@ -179,6 +188,7 @@ def make_item(obj: LanceSchema):
 
 chat_area, selection_area, summarization_area = st.columns([0.33, 0.33, 0.33])
 
+# Left column
 with chat_area:
     st.header("ICML Session Search")
     chat_area_container = st.container(height=window_height, border=True)
@@ -215,6 +225,7 @@ with chat_area:
                 with col2:
                     make_item(event)
 
+# Middle column
 with selection_area:
     st.header("Selected Sessions")
     summary_container = st.container(height=window_height, border=True)
@@ -223,6 +234,7 @@ with selection_area:
         for event_id, event in enumerate(st.session_state.selected_sessions):
             make_item(event)
 
+# Right column
 with summarization_area:
     st.header("Selected Session Chat")
 
