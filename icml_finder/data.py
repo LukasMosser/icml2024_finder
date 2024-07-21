@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime
 
@@ -12,9 +12,4 @@ class Session(BaseModel):
     abstract: str
     location: Optional[str] = None
     time_vienna: Optional[datetime] = None
-    embedding:  Optional[List[float]] = None
-
-
-
-
-
+    embedding: Optional[List[float]] = None

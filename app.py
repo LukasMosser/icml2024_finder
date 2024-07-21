@@ -4,13 +4,16 @@ from lancedb.rerankers import CohereReranker
 from collections import defaultdict
 from typing import List, Dict
 from openai import OpenAI
-from streamlit_js_eval import streamlit_js_eval
+
 st.set_page_config(layout="wide", page_title="ICML Session Finder")
 
 
-
-
-def rag_prompt(client: OpenAI, messages: List[Dict[str, str]], query: str, selected_sessions: List[LanceSchema]) -> str:
+def rag_prompt(
+    client: OpenAI,
+    messages: List[Dict[str, str]],
+    query: str,
+    selected_sessions: List[LanceSchema],
+) -> str:
     PROMPT = """
     The user has selected following <Sessions> from the Internation Conference of Machine Learning 2024 hosted in Vienna, Austria.
 
@@ -38,18 +41,15 @@ def rag_prompt(client: OpenAI, messages: List[Dict[str, str]], query: str, selec
     <Question>{query}
     """
     query_messages = [*messages]
-    query_messages.append(
-        {"role": "user", "content": PROMPT}
-        )
+    query_messages.append({"role": "user", "content": PROMPT})
     response = client.chat.completions.create(
-        model="gpt-4o-mini", 
-        messages=query_messages, 
-        stream=True
-        )
+        model="gpt-4o-mini", messages=query_messages, stream=True
+    )
     for chunk in response:
         content = chunk.choices[0].delta.content
         if content:
             yield content
+
 
 if "session_events" not in st.session_state:
     st.session_state["session_events"] = {}
@@ -86,14 +86,15 @@ with st.sidebar:
                 2. Ask any questions about all the sessions and find relevant content.
                 3. Ask the language model to perform tasks for you on the selected sessions e.g. "Make me a schedule for these." or "Tell me what these have in common".
                 4. Enjoy ICML!
-                """
-                )
+                """)
 
     st.markdown("## Utilities")
     if st.button("Clear Summary Chat"):
         st.session_state["chat_messages"] = []
         st.rerun()
-    window_height = st.slider("Chat Window Height", min_value=300, max_value=2000, value=900, step=1)
+    window_height = st.slider(
+        "Chat Window Height", min_value=300, max_value=2000, value=900, step=1
+    )
 
     st.markdown(
         """
@@ -108,11 +109,13 @@ with st.sidebar:
 
         Dataset is downloaded from [ICML Downloads](https://icml.cc/Downloads)
         """
-        )
+    )
+
 
 @st.cache_resource()
 def make_openai_client():
     return OpenAI()
+
 
 @st.cache_resource()
 def get_reranker():
@@ -120,6 +123,8 @@ def get_reranker():
 
 
 st.cache_resource()
+
+
 def get_vectordb():
     return make_vectordb("/icml_data/icml_sessions.jsonl", "/root/data/vectordb")
 
@@ -133,13 +138,13 @@ def add_to_selected_sessions(session: LanceSchema):
     remove_index = None
     for idx, selected_session in enumerate(st.session_state.selected_sessions):
         if session.payload.name in selected_session.payload.name:
-            remove_index = idx 
+            remove_index = idx
 
     if remove_index is not None:
         st.session_state.selected_sessions.pop(remove_index)
     else:
         st.session_state.selected_sessions.append(session)
-    
+
 
 def group_and_sort_events(events: List[LanceSchema]) -> dict:
     # Group events by the date of their session
@@ -169,7 +174,7 @@ def make_item(obj: LanceSchema):
                 {obj.payload.abstract}
                 ### [Link]({obj.payload.virtualsite_url})
             """
-            )
+        )
 
 
 chat_area, selection_area, summarization_area = st.columns([0.33, 0.33, 0.33])
@@ -179,36 +184,48 @@ with chat_area:
     chat_area_container = st.container(height=window_height, border=True)
 
     if prompt := st.chat_input("What is up?"):
-        results = table.search(prompt, query_type="hybrid").limit(100).rerank(normalize='score', reranker=reranker).to_pydantic(LanceSchema)
+        results = (
+            table.search(prompt, query_type="hybrid")
+            .limit(100)
+            .rerank(normalize="score", reranker=reranker)
+            .to_pydantic(LanceSchema)
+        )
         st.session_state.session_events = group_and_sort_events(results)
         st.rerun()
-    
+
     with chat_area_container:
         if len(st.session_state.prompt) > 0:
             with st.chat_message("user"):
                 st.write(st.session_state.prompt)
 
-        for group, (date_key, events_on_date) in enumerate(st.session_state.session_events.items()):
-            
+        for group, (date_key, events_on_date) in enumerate(
+            st.session_state.session_events.items()
+        ):
             st.markdown(f"## Events on {date_key}:")
             for event_id, event in enumerate(events_on_date):
                 col1, col2 = st.columns([0.05, 0.95])
                 with col1:
-                    check_val = st.checkbox("Checkbox", key=f"event_id_{group}_{event_id}", on_change=add_to_selected_sessions, args=[date_key, event], label_visibility="collapsed")
+                    check_val = st.checkbox(
+                        "Checkbox",
+                        key=f"event_id_{group}_{event_id}",
+                        on_change=add_to_selected_sessions,
+                        args=[date_key, event],
+                        label_visibility="collapsed",
+                    )
                 with col2:
                     make_item(event)
-        
+
 with selection_area:
     st.header("Selected Sessions")
     summary_container = st.container(height=window_height, border=True)
-    
+
     with summary_container:
         for event_id, event in enumerate(st.session_state.selected_sessions):
             make_item(event)
 
 with summarization_area:
     st.header("Selected Session Chat")
-    
+
     summary_container = st.container(height=window_height, border=True)
 
     with summary_container:
@@ -216,23 +233,24 @@ with summarization_area:
             if message["role"] != "system":
                 with st.chat_message(message["role"]):
                     st.write(message["content"])
-    
+
     if prompt_summary := st.chat_input("Ask anything about selected sessions"):
-        
         with summary_container:
             with st.chat_message("user"):
                 st.write(prompt_summary)
-        
+
             with st.chat_message("assistant"):
                 written_stream = summary_container.write_stream(
                     rag_prompt(
-                        st.session_state.chat_messages, 
-                        prompt_summary, 
-                        st.session_state.selected_sessions
-                        )
+                        st.session_state.chat_messages,
+                        prompt_summary,
+                        st.session_state.selected_sessions,
+                    )
                 )
-        
-        st.session_state.chat_messages.append({"role": "user", "content": prompt_summary})
+
+        st.session_state.chat_messages.append(
+            {"role": "user", "content": prompt_summary}
+        )
         st.session_state.chat_messages.append(
             {"role": "assistant", "content": written_stream}
         )

@@ -1,16 +1,14 @@
 import lancedb
-import pandas as pd
 from icml_finder.data import Session
-import jsonlines 
-import json 
+import jsonlines
+import json
 import os
-from shutil import rmtree
 from lancedb.embeddings import get_registry
 from lancedb.pydantic import LanceModel
-from lancedb.pydantic import Vector, LanceModel
-from lancedb.rerankers import CohereReranker
+from lancedb.pydantic import Vector
 
 embeddings = get_registry().get("openai").create(name="text-embedding-3-large")
+
 
 class LanceSchema(LanceModel):
     embedding: Vector(embeddings.ndims()) = embeddings.VectorField()
@@ -18,10 +16,10 @@ class LanceSchema(LanceModel):
     payload: Session
 
     class Config:
-            frozen = True
+        frozen = True
+
 
 def make_vectordb(input_file_path, vectordb_dir):
-
     if not os.path.exists(vectordb_dir):
         db = lancedb.connect(vectordb_dir)
 
@@ -31,12 +29,16 @@ def make_vectordb(input_file_path, vectordb_dir):
         with jsonlines.open(input_file_path) as reader:
             lance_objs = []
             for i, obj in enumerate(reader):
-                session = json.loads(obj) 
-                embedding = session['embedding'].copy()
-                session['embedding'] = None
-                
+                session = json.loads(obj)
+                embedding = session["embedding"].copy()
+                session["embedding"] = None
+
                 session_obj = Session(**session)
-                lance_obj = LanceSchema(embedding=embedding, abstract=session_obj.abstract, payload=session_obj)
+                lance_obj = LanceSchema(
+                    embedding=embedding,
+                    abstract=session_obj.abstract,
+                    payload=session_obj,
+                )
                 lance_objs.append(lance_obj)
 
             table.add(lance_objs)
