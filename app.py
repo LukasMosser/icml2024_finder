@@ -80,6 +80,8 @@ with st.sidebar:
                 Last updated Thursday July 21st!   
                 Double check the programme for correctness!
 
+                No warranty provided or any claims to the content. 
+
                 ## Instructions
 
                 1. Set a good window height in the sidebar
