@@ -1,23 +1,16 @@
 import streamlit as st
-st.set_page_config(layout="wide", page_title="ICML Session Finder")
-
-# Container height trick from https://discuss.streamlit.io/t/is-there-a-way-to-set-the-height-of-a-container-or-a-column-to-the-monitor-height-in-px/52504/2
-st.markdown('''
-            <style>
-            .fullHeight {height : 50vh;
-                width : 100%}
-            </style>''', unsafe_allow_html = True)
-
 from icml_finder.vectordb import make_vectordb, LanceSchema
 from lancedb.rerankers import CohereReranker
 from collections import defaultdict
 from typing import List, Dict
 from openai import OpenAI
 from streamlit_js_eval import streamlit_js_eval
+st.set_page_config(layout="wide", page_title="ICML Session Finder")
 
-client = OpenAI()
 
-def rag_prompt(messages: List[Dict[str, str]], query: str, selected_sessions: List[LanceSchema]) -> str:
+
+
+def rag_prompt(client: OpenAI, messages: List[Dict[str, str]], query: str, selected_sessions: List[LanceSchema]) -> str:
     PROMPT = """
     The user has selected following <Sessions> from the Internation Conference of Machine Learning 2024 hosted in Vienna, Austria.
 
@@ -106,13 +99,20 @@ with st.sidebar:
         """
         ## Tech Stack
         
-        - Hosting: [Modal Labs]()
-        - CI/CD: [Github Actions]()
-        - Embeddings: [OpenAI Text-003-large]()
-        - VectorDB: [LanceDB]()
-        - Frontend: [Streamlit]()
+        - Hosting: [Modal Labs](https://modal.com/)
+        - CI/CD: [Github Actions](https://github.com)
+        - Embeddings: [OpenAI Text-003-large](https://openai.com/index/new-embedding-models-and-api-updates/)
+        - VectorDB: [LanceDB](https://lancedb.com/)
+        - Frontend: [Streamlit](https://streamlit.com)
+        - Dataset Hosting: [Huggingface Datasets](https://huggingface.co/datasets/porestar/icml2024_embeddings)
+
+        Dataset is downloaded from [ICML Downloads](https://icml.cc/Downloads)
         """
         )
+
+@st.cache_resource()
+def make_openai_client():
+    return OpenAI()
 
 @st.cache_resource()
 def get_reranker():
@@ -123,7 +123,13 @@ st.cache_resource()
 def get_vectordb():
     return make_vectordb("/icml_data/icml_sessions.jsonl", "/root/data/vectordb")
 
-def add_to_selected_sessions(date_key, session: LanceSchema):
+
+client = make_openai_client()
+table = get_vectordb()
+reranker = get_reranker()
+
+
+def add_to_selected_sessions(session: LanceSchema):
     remove_index = None
     for idx, selected_session in enumerate(st.session_state.selected_sessions):
         if session.payload.name in selected_session.payload.name:
@@ -134,10 +140,6 @@ def add_to_selected_sessions(date_key, session: LanceSchema):
     else:
         st.session_state.selected_sessions.append(session)
     
-
-table = get_vectordb()
-reranker = get_reranker()
-
 
 def group_and_sort_events(events: List[LanceSchema]) -> dict:
     # Group events by the date of their session
@@ -170,14 +172,12 @@ def make_item(obj: LanceSchema):
             )
 
 
-
 chat_area, selection_area, summarization_area = st.columns([0.33, 0.33, 0.33])
 
 with chat_area:
     st.header("ICML Session Search")
     chat_area_container = st.container(height=window_height, border=True)
-    #chat_area_container.markdown("<iframe scr='linke', class = 'fullHeight'></iframe>", unsafe_allow_html = True)
-    
+
     if prompt := st.chat_input("What is up?"):
         results = table.search(prompt, query_type="hybrid").limit(100).rerank(normalize='score', reranker=reranker).to_pydantic(LanceSchema)
         st.session_state.session_events = group_and_sort_events(results)
@@ -210,7 +210,6 @@ with summarization_area:
     st.header("Selected Session Chat")
     
     summary_container = st.container(height=window_height, border=True)
-    #summary_container.markdown("<iframe scr='linke', class = 'fullHeight'></iframe>", unsafe_allow_html = True)
 
     with summary_container:
         for message in st.session_state.chat_messages:
