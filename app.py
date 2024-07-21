@@ -254,6 +254,7 @@ with summarization_area:
             with st.chat_message("assistant"):
                 written_stream = summary_container.write_stream(
                     rag_prompt(
+                        client,
                         st.session_state.chat_messages,
                         prompt_summary,
                         st.session_state.selected_sessions,
