@@ -2,19 +2,12 @@
 import shlex
 import subprocess
 from pathlib import Path
-from huggingface_hub import hf_hub_download
 import modal
 
 # ## Define container dependencies
 #
 # The `app.py` script imports three third-party packages, so we include these in the example's
 # image definition.
-hf_hub_download(
-    repo_id="porestar/icml2024_embeddings",
-    filename="icml_sessions.jsonl",
-    local_dir="./data",
-    repo_type="dataset",
-)
 
 image = (
     modal.Image.debian_slim(python_version="3.11")
