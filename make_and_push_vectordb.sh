@@ -1,0 +1,1 @@
+python make_vectordb.py && modal volume put --force icml_data ./data/vectordb /vectordb 

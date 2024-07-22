@@ -143,7 +143,7 @@ def get_reranker():
 
 st.cache_resource()
 def get_vectordb():
-    return make_vectordb("/icml_data/icml_sessions.jsonl", "/root/data/vectordb")
+    return make_vectordb("/icml_data/vectordb")
 
 
 client = make_openai_client()
