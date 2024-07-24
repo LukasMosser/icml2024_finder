@@ -85,7 +85,7 @@ with st.sidebar:
 
                 If you like this give me shoutout on [Twitter](https://twitter.com/porestar) or [LinkedIn](https://www.linkedin.com/in/lukas-mosser/)!
                 
-                Last updated Thursday July 21st!   
+                Last updated Wednesday July 24th!   
                 Double check the programme for correctness!
 
                 No warranty provided or any claims to the content. 
